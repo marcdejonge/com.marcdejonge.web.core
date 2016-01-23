@@ -1,0 +1,27 @@
+Bundle-Version: 1.0.0.${tstamp}
+
+Export-Package: nl.jonghuis.web.core.api
+Private-Package: nl.jonghuis.web.core, nl.jonghuis.web.core.registration
+Conditional-Package: io.netty*, javassist
+Import-Package: \
+	com.*;resolution:=optional,\
+	org.apache.*;resolution:=optional,\
+	org.eclipse.*;resolution:=optional,\
+	javassist;resolution:=optional,\
+	sun.*;resolution:=optional,\
+	*
+
+-buildpath: \
+	com.marcdejonge.codec;version=project,\
+	osgi.core;version=latest,\
+	osgi.cmpn;version=latest,\
+	osgi.annotation;version=latest,\
+	slf4j.api;version=latest,\
+	io.netty.common;version=latest,\
+	io.netty.buffer;version=latest,\
+	io.netty.transport;version=latest,\
+	io.netty.handler;version=latest,\
+	io.netty.codec;version=latest,\
+	io.netty.codec-http;version=latest
+
+-dsannotations: *
