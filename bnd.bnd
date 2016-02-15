@@ -1,14 +1,16 @@
-Bundle-Version: 1.0.0.${tstamp}
+Bundle-Version: 1.0.0.${buildid}
 
 Export-Package: nl.jonghuis.web.core.api
 Private-Package: nl.jonghuis.web.core, nl.jonghuis.web.core.registration
-Conditional-Package: io.netty*, javassist
+Conditional-Package: io.netty*
 Import-Package: \
 	com.*;resolution:=optional,\
 	org.apache.*;resolution:=optional,\
 	org.eclipse.*;resolution:=optional,\
 	javassist;resolution:=optional,\
 	sun.*;resolution:=optional,\
+	lzma.*;resolution:=optional,\
+	net.jpountz.*;resolution:=optional,\
 	*
 
 -buildpath: \
@@ -19,9 +21,11 @@ Import-Package: \
 	slf4j.api;version=latest,\
 	io.netty.common;version=latest,\
 	io.netty.buffer;version=latest,\
+	io.netty.resolver;version=latest,\
 	io.netty.transport;version=latest,\
 	io.netty.handler;version=latest,\
 	io.netty.codec;version=latest,\
 	io.netty.codec-http;version=latest
 
 -dsannotations: *
+-metatypeannotations: *

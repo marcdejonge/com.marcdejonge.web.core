@@ -30,7 +30,7 @@ public class HttpSwitcher extends SimpleChannelInboundHandler<Object> {
 			DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
 			                                                               HttpResponseStatus.MOVED_PERMANENTLY);
 
-			String newUrl = "https://" + "localhost" // FIXME: HttpHeaderUtil.getHost(httpRequest)
+			String newUrl = "https://" + httpRequest.headers().get("Host")
 			                + (port == 443 ? "" : ":" + port)
 			                + httpRequest.uri();
 			response.headers().add(HttpHeaderNames.LOCATION, newUrl);

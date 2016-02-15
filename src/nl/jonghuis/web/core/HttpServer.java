@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.metatype.annotations.Designate;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
-@Component(immediate = true)
+@Component(immediate = true, configurationPolicy = ConfigurationPolicy.OPTIONAL)
 @Designate(factory = false, ocd = HttpConfiguration.class)
 public class HttpServer {
 	static final Logger logger = LoggerFactory.getLogger(HttpServer.class);

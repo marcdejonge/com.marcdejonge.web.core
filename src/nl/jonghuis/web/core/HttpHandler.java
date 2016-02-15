@@ -7,6 +7,8 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
+import java.util.Map.Entry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +48,9 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
 			responseBuffer.setLength(0); // Reset if this object is reused
 			responseBuffer.append("Welcome to my server!\n");
 			responseBuffer.append("Path: " + httpRequest.uri() + "\n");
+			for (Entry<CharSequence, CharSequence> header : httpRequest.headers()) {
+				responseBuffer.append("Header [" + header.getKey() + "] = " + header.getValue() + "\n");
+			}
 		}
 
 		if (msg instanceof LastHttpContent) {

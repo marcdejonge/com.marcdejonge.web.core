@@ -16,7 +16,7 @@ public @interface HttpConfiguration {
 	int httpsPort() default 443;
 
 	@AttributeDefinition(description = "If this is set to true, any HTTP request will be forwarded to the same URL on HTTPS")
-	boolean alwaysSwitchToHttps() default false;
+	boolean alwaysSwitchToHttps() default true;
 
 	@AttributeDefinition(min = "0",
 	                     max = "128",
