@@ -1,6 +1,10 @@
 package nl.jonghuis.web.core.api;
 
+import java.io.IOException;
+
 public class ErrorView implements View {
+
+	public static final ErrorView NOT_FOUND = new ErrorView(404, "Not Found");
 
 	public static final ErrorView INTERNAL_SERVER_ERROR = new ErrorView(500, "Internal Server Error");
 
@@ -19,8 +23,8 @@ public class ErrorView implements View {
 	}
 
 	@Override
-	public void write(Writer writer) {
-		writer.write(message);
+	public void write(Appendable writer) throws IOException {
+		writer.append(message);
 	}
 
 	@Override

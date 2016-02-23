@@ -1,6 +1,6 @@
 Bundle-Version: 1.0.0.${buildid}
 
-Export-Package: nl.jonghuis.web.core.api
+Export-Package: nl.jonghuis.web.core.api*
 Private-Package: nl.jonghuis.web.core, nl.jonghuis.web.core.registration
 Conditional-Package: io.netty*
 Import-Package: \
@@ -25,7 +25,8 @@ Import-Package: \
 	io.netty.transport;version=latest,\
 	io.netty.handler;version=latest,\
 	io.netty.codec;version=latest,\
-	io.netty.codec-http;version=latest
+	io.netty.codec-http;version=latest,\
+	com.google.guava;version=latest
 
 -dsannotations: *
 -metatypeannotations: *

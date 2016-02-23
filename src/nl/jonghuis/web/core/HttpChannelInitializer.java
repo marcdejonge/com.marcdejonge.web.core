@@ -1,5 +1,7 @@
 package nl.jonghuis.web.core;
 
+import nl.jonghuis.web.core.registration.ControllerTracker;
+
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -9,12 +11,14 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
 
 	private final int switchToHttpsPort;
+	private final ControllerTracker tracker;
 
-	public HttpChannelInitializer() {
-		this(false, 0);
+	public HttpChannelInitializer(ControllerTracker tracker) {
+		this(false, 0, tracker);
 	}
 
-	public HttpChannelInitializer(boolean alwaysSwitchToHttps, int httpsPort) {
+	public HttpChannelInitializer(boolean alwaysSwitchToHttps, int httpsPort, ControllerTracker tracker) {
+		this.tracker = tracker;
 		if (alwaysSwitchToHttps && httpsPort > 0) {
 			switchToHttpsPort = httpsPort;
 		} else {
@@ -32,8 +36,10 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
 		if (switchToHttpsPort > 0) {
 			ch.pipeline().addLast(new HttpSwitcher(switchToHttpsPort));
 		} else {
-			ch.pipeline().addLast(new HttpHandler());
+			ch.pipeline().addLast(new HttpHandler(tracker));
 		}
+
+		ch.pipeline().addLast(new ViewHandler());
 	}
 
 }

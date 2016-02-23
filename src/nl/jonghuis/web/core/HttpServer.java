@@ -1,11 +1,14 @@
 package nl.jonghuis.web.core;
 
+import nl.jonghuis.web.core.registration.ControllerTracker;
+
 import java.io.File;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.metatype.annotations.Designate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +44,13 @@ public class HttpServer {
 		}
 	}
 
+	private ControllerTracker tracker;
+
+	@Reference
+	public void setTracker(ControllerTracker tracker) {
+		this.tracker = tracker;
+	}
+
 	private EventLoopGroup bossGroup;
 	private EventLoopGroup workerGroup;
 
@@ -61,7 +71,8 @@ public class HttpServer {
 				                        .option(ChannelOption.SO_BACKLOG, 128)
 				                        .childOption(ChannelOption.SO_KEEPALIVE, true)
 				                        .childHandler(new HttpsChannelInitializer(new File(config.sslChainFile()),
-				                                                                  new File(config.sslKeyFile())))
+				                                                                  new File(config.sslKeyFile()),
+				                                                                  tracker))
 				                        .bind(config.httpsPort())
 				                        .channel();
 				httpsChannel.closeFuture().addListener(new CloseLogger("HTTPS channel"));
@@ -79,7 +90,8 @@ public class HttpServer {
 		                       .option(ChannelOption.SO_BACKLOG, 128)
 		                       .childOption(ChannelOption.SO_KEEPALIVE, true)
 		                       .childHandler(new HttpChannelInitializer(config.alwaysSwitchToHttps() && hasHttps,
-		                                                                config.httpsPort()))
+		                                                                config.httpsPort(),
+		                                                                tracker))
 		                       .bind(config.httpPort())
 		                       .channel();
 		httpChannel.closeFuture().addListener(new CloseLogger("HTTP channel"));

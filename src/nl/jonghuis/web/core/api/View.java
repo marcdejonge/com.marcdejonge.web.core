@@ -1,9 +1,15 @@
 package nl.jonghuis.web.core.api;
 
+import java.io.IOException;
+
 public interface View {
 	int resultCode();
 
 	String getContentType();
 
-	void write(Writer writer);
+	default int getContentLength() {
+		return 0;
+	}
+
+	void write(Appendable writer) throws IOException;
 }
