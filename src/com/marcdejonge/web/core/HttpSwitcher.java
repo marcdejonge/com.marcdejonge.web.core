@@ -1,4 +1,4 @@
-package nl.jonghuis.web.core;
+package com.marcdejonge.web.core;
 
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;

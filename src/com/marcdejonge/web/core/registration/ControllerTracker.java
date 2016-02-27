@@ -1,20 +1,24 @@
-package nl.jonghuis.web.core.registration;
-
-import nl.jonghuis.web.core.api.Controller;
-import nl.jonghuis.web.core.api.ErrorView;
-import nl.jonghuis.web.core.api.View;
+package com.marcdejonge.web.core.registration;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.marcdejonge.web.core.api.Controller;
+import com.marcdejonge.web.core.api.ErrorView;
+import com.marcdejonge.web.core.api.View;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Component
+@Component(service = ControllerTracker.class)
 public class ControllerTracker {
+	private static final Logger logger = LoggerFactory.getLogger(ControllerTracker.class);
+
 	private final Map<String, ControllerWrapper> controllers = new HashMap<>();
 
 	private String getName(Controller controller, Map<String, Object> properties) {
@@ -35,6 +39,7 @@ public class ControllerTracker {
 		if (controllers.containsKey(name)) {
 			throw new IllegalArgumentException("Second controller on the nome " + name + " detected");
 		}
+		logger.debug("Adding controller for {}", name);
 		controllers.put(name, new ControllerWrapper(controller));
 	}
 
@@ -42,11 +47,14 @@ public class ControllerTracker {
 		String name = getName(controller, properties);
 		ControllerWrapper wrapper = controllers.get(name);
 		if (wrapper != null && wrapper.hasController(controller)) {
+			logger.debug("Removing controller for {}", name);
 			controllers.remove(name);
 		}
 	}
 
 	public View invokeController(Request request) {
+		logger.debug("Invoking for request: " + request);
+
 		List<String> pathParts = request.getPathParts();
 		int pathIndex = 0;
 		ControllerWrapper controller = pathParts.size() > pathIndex
@@ -55,6 +63,7 @@ public class ControllerTracker {
 		if (controller == null) {
 			controller = controllers.get("root");
 			if (controller == null) {
+				logger.debug("Controller not found");
 				return ErrorView.NOT_FOUND;
 			}
 		} else {
@@ -68,6 +77,7 @@ public class ControllerTracker {
 			methodName = controller.findMethod("index", request.getHttpMethod());
 		}
 		if (methodName == null) {
+			logger.debug("Method not found");
 			return ErrorView.NOT_FOUND;
 		}
 

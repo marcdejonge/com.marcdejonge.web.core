@@ -1,6 +1,6 @@
-package nl.jonghuis.web.core;
+package com.marcdejonge.web.core;
 
-import nl.jonghuis.web.core.registration.ControllerTracker;
+import com.marcdejonge.web.core.registration.ControllerTracker;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -29,17 +29,17 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
 	@Override
 	protected void initChannel(SocketChannel ch) throws Exception {
 		ch.pipeline()
+		  .addLast(new LoggingChannelHandler())
+		  .addLast(new HttpResponseEncoder())
 		  .addLast(new HttpRequestDecoder())
 		  .addLast(new HttpObjectAggregator(1024 * 1024))
-		  .addLast(new HttpResponseEncoder());
+		  .addLast(new ViewHandler());
 
 		if (switchToHttpsPort > 0) {
 			ch.pipeline().addLast(new HttpSwitcher(switchToHttpsPort));
 		} else {
 			ch.pipeline().addLast(new HttpHandler(tracker));
 		}
-
-		ch.pipeline().addLast(new ViewHandler());
 	}
 
 }

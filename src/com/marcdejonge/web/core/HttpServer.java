@@ -1,8 +1,8 @@
-package nl.jonghuis.web.core;
-
-import nl.jonghuis.web.core.registration.ControllerTracker;
+package com.marcdejonge.web.core;
 
 import java.io.File;
+
+import com.marcdejonge.web.core.registration.ControllerTracker;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -56,6 +56,8 @@ public class HttpServer {
 
 	@Activate
 	public void activate(HttpConfiguration config) {
+		logger.info("Booting HttpServer");
+
 		bossGroup = new NioEventLoopGroup(config.nrOfConnectionHandlers());
 		workerGroup = new NioEventLoopGroup(config.nrOfWorkers());
 

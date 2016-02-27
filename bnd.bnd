@@ -1,7 +1,7 @@
 Bundle-Version: 1.0.0.${buildid}
 
-Export-Package: nl.jonghuis.web.core.api*
-Private-Package: nl.jonghuis.web.core, nl.jonghuis.web.core.registration
+Export-Package: com.marcdejonge.web.core.api*
+Private-Package: com.marcdejonge.web.core, com.marcdejonge.web.core.registration
 Conditional-Package: io.netty*
 Import-Package: \
 	com.*;resolution:=optional,\

@@ -1,8 +1,8 @@
-package nl.jonghuis.web.core.api;
+package com.marcdejonge.web.core.api;
 
 import java.io.IOException;
 
-public class ErrorView implements View {
+public class ErrorView extends TextView {
 
 	public static final ErrorView NOT_FOUND = new ErrorView(404, "Not Found");
 
@@ -25,6 +25,11 @@ public class ErrorView implements View {
 	@Override
 	public void write(Appendable writer) throws IOException {
 		writer.append(message);
+	}
+
+	@Override
+	public int getContentLength() {
+		return message.length();
 	}
 
 	@Override

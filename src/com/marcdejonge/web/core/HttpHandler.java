@@ -1,14 +1,15 @@
-package nl.jonghuis.web.core;
+package com.marcdejonge.web.core;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderNames.TRANSFER_ENCODING;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
-import nl.jonghuis.web.core.api.View;
-import nl.jonghuis.web.core.registration.ControllerTracker;
-import nl.jonghuis.web.core.registration.Request;
+import com.marcdejonge.web.core.api.View;
+import com.marcdejonge.web.core.registration.ControllerTracker;
+import com.marcdejonge.web.core.registration.Request;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +18,12 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.DecoderResult;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderUtil;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.LastHttpContent;
 
@@ -55,17 +56,23 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
 
 		if (msg instanceof LastHttpContent) {
 			View view = tracker.invokeController(request);
-			HttpResponse response = new DefaultHttpResponse(HTTP_1_1, HttpResponseStatus.valueOf(view.resultCode()));
+			logger.debug("Writing view of type {}", view.getClass().getName());
+
+			DefaultHttpResponse response = new DefaultHttpResponse(HTTP_1_1,
+			                                                       HttpResponseStatus.valueOf(view.resultCode()));
 			response.headers().set(CONTENT_TYPE, view.getContentType());
 			if (view.getContentLength() > 0) {
 				response.headers().setInt(CONTENT_LENGTH, view.getContentLength());
+			} else {
+				response.headers().set(TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
 			}
 			if (request.isKeepAlive()) {
 				response.headers().set(CONNECTION, HttpHeaderValues.KEEP_ALIVE);
 			}
+			response.setDecoderResult(DecoderResult.SUCCESS);
 
 			ChannelFuture f = ctx.write(response);
-			f = ctx.writeAndFlush(view);
+			f = ctx.write(view);
 			if (!request.isKeepAlive()) {
 				f.addListener(ChannelFutureListener.CLOSE);
 			}

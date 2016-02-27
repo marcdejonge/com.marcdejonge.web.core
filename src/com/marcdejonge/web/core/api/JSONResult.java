@@ -1,4 +1,4 @@
-package nl.jonghuis.web.core.api;
+package com.marcdejonge.web.core.api;
 
 import java.io.IOException;
 
@@ -7,7 +7,7 @@ import com.marcdejonge.codec.json.JSONEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JSONResult implements View {
+public class JSONResult extends TextView {
 	private static final Logger logger = LoggerFactory.getLogger(JSONResult.class);
 
 	private final Object object;

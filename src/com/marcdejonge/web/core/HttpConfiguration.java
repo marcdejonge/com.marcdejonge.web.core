@@ -1,4 +1,4 @@
-package nl.jonghuis.web.core;
+package com.marcdejonge.web.core;
 
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
@@ -8,12 +8,12 @@ public @interface HttpConfiguration {
 	@AttributeDefinition(min = "1",
 	                     max = "65535",
 	                     description = "The port on which the server will listen for HTTP requests")
-	int httpPort() default 80;
+	int httpPort() default 8080;
 
 	@AttributeDefinition(min = "0",
 	                     max = "65535",
 	                     description = "The port on which the server will listen for Secure HTTP requests. 0 will disable HTTPS.")
-	int httpsPort() default 443;
+	int httpsPort() default 8443;
 
 	@AttributeDefinition(description = "If this is set to true, any HTTP request will be forwarded to the same URL on HTTPS")
 	boolean alwaysSwitchToHttps() default true;

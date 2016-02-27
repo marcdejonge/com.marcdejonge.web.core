@@ -1,4 +1,4 @@
-package nl.jonghuis.web.core.registration;
+package com.marcdejonge.web.core.registration;
 
 import java.util.List;
 

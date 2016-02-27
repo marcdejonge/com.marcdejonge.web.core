@@ -1,2 +1,2 @@
 @org.osgi.annotation.versioning.Version("1.0.0")
-package nl.jonghuis.web.core.api;
+package com.marcdejonge.web.core.api;

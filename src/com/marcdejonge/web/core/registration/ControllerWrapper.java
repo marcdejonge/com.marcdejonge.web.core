@@ -1,14 +1,4 @@
-package nl.jonghuis.web.core.registration;
-
-import nl.jonghuis.web.core.api.Controller;
-import nl.jonghuis.web.core.api.ErrorView;
-import nl.jonghuis.web.core.api.JSONResult;
-import nl.jonghuis.web.core.api.View;
-import nl.jonghuis.web.core.api.annotations.GetParam;
-import nl.jonghuis.web.core.api.annotations.Header;
-import nl.jonghuis.web.core.api.annotations.Hostname;
-import nl.jonghuis.web.core.api.annotations.PathPart;
-import nl.jonghuis.web.core.api.annotations.RequestType;
+package com.marcdejonge.web.core.registration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,6 +7,15 @@ import java.util.Map;
 
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.Parameter;
+import com.marcdejonge.web.core.api.Controller;
+import com.marcdejonge.web.core.api.ErrorView;
+import com.marcdejonge.web.core.api.JSONResult;
+import com.marcdejonge.web.core.api.View;
+import com.marcdejonge.web.core.api.annotations.GetParam;
+import com.marcdejonge.web.core.api.annotations.Header;
+import com.marcdejonge.web.core.api.annotations.Hostname;
+import com.marcdejonge.web.core.api.annotations.PathPart;
+import com.marcdejonge.web.core.api.annotations.RequestType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,16 +34,22 @@ public class ControllerWrapper {
 
 		methods = new HashMap<>();
 
-		for (Method method : controller.getClass().getMethods()) {
+		for (Method method : controller.getClass().getDeclaredMethods()) {
 			@SuppressWarnings("unchecked")
 			Invokable<Controller, Object> m = (Invokable<Controller, Object>) Invokable.from(method);
-			if (m.isPublic() && !m.isStatic() && !m.isNative()) {
+			if (m.isPublic() && !m.isStatic() && !m.isNative() && !m.getReturnType().isSubtypeOf(Void.TYPE)) {
 				String name = m.getName().toLowerCase();
 				RequestType requestTypeAnno = m.getAnnotation(RequestType.class);
 				String requestType = requestTypeAnno == null ? "get" : requestTypeAnno.value().toLowerCase();
 
-				methods.put(requestType + '$' + name, m);
+				String methodName = requestType + '$' + name;
+				methods.put(methodName, m);
+				logger.debug("Adding method {}", methodName);
 			}
+		}
+
+		if (methods.isEmpty()) {
+			logger.error("No methods found on controller of type {}", controller.getClass().getName());
 		}
 	}
 
@@ -53,7 +58,7 @@ public class ControllerWrapper {
 		if (name.endsWith(".html")) {
 			name = name.substring(0, name.length() - 5);
 		}
-		return httpMethod.name().toLowerCase() + name;
+		return httpMethod.name().toLowerCase() + "$" + name;
 	}
 
 	public View invoke(String name, Request req, int pathIndex) {
@@ -80,9 +85,12 @@ public class ControllerWrapper {
 			}
 
 			PathPart pathParam = parameter.getAnnotation(PathPart.class);
-			if (req.getPathParts().size() > pathIndex && pathParam != null
-			    && parameter.getType().isSubtypeOf(String.class)) {
-				parameters[ix] = req.getPathParts().get(pathIndex++);
+			if (pathParam != null && parameter.getType().isSubtypeOf(String.class)) {
+				if (req.getPathParts().size() > pathIndex) {
+					parameters[ix] = req.getPathParts().get(pathIndex++);
+				} else {
+					parameters[ix] = "";
+				}
 			}
 		}
 
