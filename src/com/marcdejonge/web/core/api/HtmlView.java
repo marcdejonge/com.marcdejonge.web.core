@@ -1,6 +1,6 @@
 package com.marcdejonge.web.core.api;
 
-public abstract class HtmlView extends TextView {
+public abstract class HtmlView implements TextView {
 
 	@Override
 	public int resultCode() {

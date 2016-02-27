@@ -29,7 +29,7 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
 	@Override
 	protected void initChannel(SocketChannel ch) throws Exception {
 		ch.pipeline()
-		  .addLast(new LoggingChannelHandler())
+		  // .addLast(new LoggingChannelHandler())
 		  .addLast(new HttpResponseEncoder())
 		  .addLast(new HttpRequestDecoder())
 		  .addLast(new HttpObjectAggregator(1024 * 1024))

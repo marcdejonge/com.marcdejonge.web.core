@@ -81,7 +81,7 @@ public class Request {
 
 	@Override
 	public String toString() {
-		return "RequestImpl [hostname=" + hostname
+		return "[hostname=" + hostname
 		       + ", pathParts="
 		       + pathParts
 		       + ", params="

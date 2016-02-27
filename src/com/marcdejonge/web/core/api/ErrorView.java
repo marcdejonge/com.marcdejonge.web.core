@@ -2,7 +2,7 @@ package com.marcdejonge.web.core.api;
 
 import java.io.IOException;
 
-public class ErrorView extends TextView {
+public class ErrorView implements TextView {
 
 	public static final ErrorView NOT_FOUND = new ErrorView(404, "Not Found");
 

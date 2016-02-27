@@ -1,6 +1,8 @@
 package com.marcdejonge.web.core;
 
-import com.marcdejonge.web.core.api.View;
+import java.io.IOException;
+
+import com.marcdejonge.web.core.api.TextView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +17,20 @@ public class ViewHandler extends ChannelHandlerAdapter {
 	@Override
 	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
 		logger.trace("Write( {} )", msg.getClass().getSimpleName());
-		if (msg instanceof View) {
-			View view = (View) msg;
+		if (msg instanceof FileView) {
+			FileView view = (FileView) msg;
 			view.write(ctx, promise);
+		} else if (msg instanceof TextView) {
+			TextView view = (TextView) msg;
+
+			try {
+				try (TextViewWriter w = new TextViewWriter(ctx, promise)) {
+					view.write(w);
+				}
+			} catch (IOException e) {
+				ctx.fireExceptionCaught(e);
+			}
+
 		} else {
 			ctx.write(msg, promise);
 		}

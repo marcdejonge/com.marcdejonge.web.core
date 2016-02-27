@@ -1,4 +1,4 @@
-package com.marcdejonge.web.core.api;
+package com.marcdejonge.web.core;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import com.google.common.io.ByteStreams;
+import com.marcdejonge.web.core.api.View;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -80,7 +81,6 @@ public class FileView implements View {
 		}
 	}
 
-	@Override
 	public void write(ChannelHandlerContext ctx, ChannelPromise promise) {
 		contents.retain(); // To make sure that sending a duplicate doesn't destroy the contents buffer
 		ctx.write(new DefaultLastHttpContent(contents.duplicate()), promise);

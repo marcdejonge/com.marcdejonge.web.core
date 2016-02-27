@@ -7,7 +7,7 @@ import com.marcdejonge.codec.json.JSONEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JSONResult extends TextView {
+public class JSONResult implements TextView {
 	private static final Logger logger = LoggerFactory.getLogger(JSONResult.class);
 
 	private final Object object;

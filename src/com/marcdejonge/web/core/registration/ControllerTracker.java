@@ -40,7 +40,7 @@ public class ControllerTracker {
 			throw new IllegalArgumentException("Second controller on the nome " + name + " detected");
 		}
 		logger.debug("Adding controller for {}", name);
-		controllers.put(name, new ControllerWrapper(controller));
+		controllers.put(name, new ControllerWrapper(controller, name));
 	}
 
 	public void removeController(Controller controller, Map<String, Object> properties) {
@@ -81,6 +81,7 @@ public class ControllerTracker {
 			return ErrorView.NOT_FOUND;
 		}
 
+		logger.debug("Invoking {} # {}", controller.getName(), methodName);
 		return controller.invoke(methodName, request, pathIndex);
 	}
 }

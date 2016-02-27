@@ -1,9 +1,15 @@
 package com.marcdejonge.web.core.api;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
+import java.io.IOException;
+import java.net.URL;
+
+import com.marcdejonge.web.core.FileView;
 
 public interface View {
+	public static View getCachedView(URL fileUrl) throws IOException {
+		return FileView.getCachedView(fileUrl);
+	}
+
 	int resultCode();
 
 	String getContentType();
@@ -11,6 +17,4 @@ public interface View {
 	default int getContentLength() {
 		return 0;
 	}
-
-	void write(ChannelHandlerContext ctx, ChannelPromise promise);
 }

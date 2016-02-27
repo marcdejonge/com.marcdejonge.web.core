@@ -29,8 +29,11 @@ public class ControllerWrapper {
 
 	private final Map<String, Invokable<Controller, ?>> methods;
 
-	public ControllerWrapper(Controller controller) {
+	private final String name;
+
+	public ControllerWrapper(Controller controller, String controllerName) {
 		this.controller = controller;
+		name = controllerName;
 
 		methods = new HashMap<>();
 
@@ -51,6 +54,10 @@ public class ControllerWrapper {
 		if (methods.isEmpty()) {
 			logger.error("No methods found on controller of type {}", controller.getClass().getName());
 		}
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	private static final String parseName(String name, HttpMethod httpMethod) {
