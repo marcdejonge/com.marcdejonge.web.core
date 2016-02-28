@@ -1,48 +1,13 @@
 package com.marcdejonge.web.core;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Map;
-import java.util.WeakHashMap;
-
-import com.google.common.io.ByteStreams;
 import com.marcdejonge.web.core.api.View;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.DefaultLastHttpContent;
 
 public class FileView implements View {
-
-	private static final PooledByteBufAllocator ALLOCATOR = new PooledByteBufAllocator(true);
-	private static final Map<String, FileView> cache = new WeakHashMap<>();
-
-	public static FileView getCachedView(URL fileUrl) throws IOException {
-		String key = fileUrl.toString();
-
-		synchronized (cache) {
-			FileView view = cache.get(key);
-			if (view != null) {
-				return view;
-			}
-		}
-
-		ByteBuf buffer;
-		try (InputStream in = fileUrl.openStream()) {
-			byte[] bs = ByteStreams.toByteArray(in);
-			buffer = ALLOCATOR.directBuffer(bs.length);
-			buffer.writeBytes(bs);
-		}
-
-		synchronized (cache) {
-			FileView view = new FileView(buffer, fileUrl.getPath());
-			cache.put(key, view);
-			return view;
-		}
-	}
 
 	private final ByteBuf contents;
 	private final String extension;
