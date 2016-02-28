@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.base.Splitter;
 import com.marcdejonge.codec.MixedMap;
 import com.marcdejonge.codec.url.URLDecoder;
+import com.marcdejonge.web.core.ContentHandler;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderUtil;
@@ -40,6 +41,7 @@ public class Request {
 	private final MixedMap params;
 	private final HttpHeaders headers;
 	private final boolean keepAlive;
+	private ContentHandler<?> contentHandler;
 
 	private Request(CharSequence hostname,
 	                HttpMethod httpMethod,
@@ -89,5 +91,13 @@ public class Request {
 		       + ", headers="
 		       + headers
 		       + "]";
+	}
+
+	public void setContent(ContentHandler<?> contentHandler) {
+		this.contentHandler = contentHandler;
+	}
+
+	public ContentHandler<?> getContentHandler() {
+		return contentHandler;
 	}
 }

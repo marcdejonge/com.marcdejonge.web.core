@@ -4,6 +4,8 @@ import java.io.IOException;
 
 public class ErrorView implements TextView {
 
+	public static final ErrorView BAD_REQUEST = new ErrorView(400, "Bad Request");
+
 	public static final ErrorView NOT_FOUND = new ErrorView(404, "Not Found");
 
 	public static final ErrorView INTERNAL_SERVER_ERROR = new ErrorView(500, "Internal Server Error");

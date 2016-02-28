@@ -18,6 +18,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.DecoderResult;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
+import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaderUtil;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpRequest;
@@ -28,6 +29,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
 	private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 
 	private Request request;
+	private ContentHandler<?> contentHandler;
 
 	private final ControllerTracker tracker;
 
@@ -49,6 +51,21 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
 			if (HttpHeaderUtil.is100ContinueExpected(httpRequest)) {
 				ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
 			}
+
+			contentHandler = null;
+			if (httpRequest.headers().contains(CONTENT_TYPE)) {
+				switch (httpRequest.headers().getAndConvert(CONTENT_TYPE)) {
+				case "text/plain":
+					contentHandler = new TextContentHandler();
+					break;
+				}
+			}
+
+			request.setContent(contentHandler);
+		}
+
+		if (msg instanceof HttpContent && contentHandler != null) {
+			contentHandler.handle((HttpContent) msg);
 		}
 
 		if (msg instanceof LastHttpContent) {

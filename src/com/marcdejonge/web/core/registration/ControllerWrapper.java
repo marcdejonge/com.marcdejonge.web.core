@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.Parameter;
+import com.marcdejonge.web.core.ContentHandler;
 import com.marcdejonge.web.core.api.Controller;
 import com.marcdejonge.web.core.api.ErrorView;
 import com.marcdejonge.web.core.api.JSONResult;
@@ -16,6 +17,7 @@ import com.marcdejonge.web.core.api.annotations.Header;
 import com.marcdejonge.web.core.api.annotations.Hostname;
 import com.marcdejonge.web.core.api.annotations.PathPart;
 import com.marcdejonge.web.core.api.annotations.PathRest;
+import com.marcdejonge.web.core.api.annotations.PostData;
 import com.marcdejonge.web.core.api.annotations.RequestType;
 
 import org.slf4j.Logger;
@@ -113,6 +115,21 @@ public class ControllerWrapper {
 				} else {
 					parameters[ix] = sb.substring(1);
 				}
+			}
+
+			PostData postDataParam = parameter.getAnnotation(PostData.class);
+			if (postDataParam != null) {
+				ContentHandler<?> contentHandler = req.getContentHandler();
+				if (contentHandler != null) {
+					Object contents = contentHandler.getContents();
+					if (contents != null && parameter.getType().isSupertypeOf(contents.getClass())) {
+						parameters[ix] = contents;
+					}
+				}
+			}
+
+			if (parameters[ix] == null) {
+				return ErrorView.BAD_REQUEST;
 			}
 		}
 

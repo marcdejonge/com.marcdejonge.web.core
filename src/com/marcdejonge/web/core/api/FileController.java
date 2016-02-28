@@ -17,8 +17,18 @@ import io.netty.buffer.Unpooled;
 
 public class FileController {
 	protected final Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+	private final String searchFolder;
 	private final Map<String, View> cache = new WeakHashMap<>();
 	private final String tag = "tag-" + System.currentTimeMillis();
+
+	public FileController() {
+		this("web");
+	}
+
+	public FileController(String searchFolder) {
+		this.searchFolder = searchFolder;
+	}
 
 	protected View getCachedView(URL fileUrl) throws IOException {
 		String key = fileUrl.toString();
@@ -51,7 +61,11 @@ public class FileController {
 			path = "index.html";
 		}
 
-		URL url = bundle.getResource("web/" + path);
+		if (path.charAt(0) != '/') {
+			path = "/" + path;
+		}
+
+		URL url = bundle.getResource(searchFolder + path);
 		if (url != null) {
 			View cachedView = getCachedView(url);
 			if (cachedView instanceof FileView && this.tag.equals(tag)) {
