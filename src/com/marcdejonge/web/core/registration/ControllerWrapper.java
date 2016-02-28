@@ -15,6 +15,7 @@ import com.marcdejonge.web.core.api.annotations.GetParam;
 import com.marcdejonge.web.core.api.annotations.Header;
 import com.marcdejonge.web.core.api.annotations.Hostname;
 import com.marcdejonge.web.core.api.annotations.PathPart;
+import com.marcdejonge.web.core.api.annotations.PathRest;
 import com.marcdejonge.web.core.api.annotations.RequestType;
 
 import org.slf4j.Logger;
@@ -92,11 +93,25 @@ public class ControllerWrapper {
 			}
 
 			PathPart pathParam = parameter.getAnnotation(PathPart.class);
-			if (pathParam != null && parameter.getType().isSubtypeOf(String.class)) {
+			if (pathParam != null && parameter.getType().isSupertypeOf(String.class)) {
 				if (req.getPathParts().size() > pathIndex) {
 					parameters[ix] = req.getPathParts().get(pathIndex++);
 				} else {
 					parameters[ix] = "";
+				}
+			}
+
+			PathRest restParam = parameter.getAnnotation(PathRest.class);
+			if (restParam != null && parameter.getType().isSupertypeOf(String.class)) {
+				StringBuilder sb = new StringBuilder();
+				for (; pathIndex < req.getPathParts().size(); pathIndex++) {
+					sb.append('/').append(req.getPathParts().get(pathIndex));
+				}
+
+				if (sb.length() == 0) {
+					parameters[ix] = "";
+				} else {
+					parameters[ix] = sb.substring(1);
 				}
 			}
 		}

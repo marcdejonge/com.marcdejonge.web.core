@@ -1,15 +1,14 @@
 package com.marcdejonge.web.core;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.buffer.Unpooled;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.DefaultHttpContent;
@@ -24,14 +23,12 @@ public class TextViewWriter implements Appendable, AutoCloseable {
 	private final ChannelHandlerContext ctx;
 	private final ChannelPromise promise;
 
-	private final ByteBuffer buffer;
-	private final CharsetEncoder encoder;
+	private final CharBuffer buffer;
 
 	public TextViewWriter(ChannelHandlerContext ctx, ChannelPromise promise) {
 		this.ctx = ctx;
 		this.promise = promise;
-		buffer = ByteBuffer.allocate(8 * 1024);
-		encoder = UTF8.newEncoder();
+		buffer = CharBuffer.allocate(8 * 1024);
 	}
 
 	@Override
@@ -41,42 +38,39 @@ public class TextViewWriter implements Appendable, AutoCloseable {
 
 	@Override
 	public Appendable append(char c) throws IOException {
-		if (buffer.remaining() < 16) {
+		if (buffer.remaining() < 1) {
 			writeBuffer(ctx.voidPromise());
 		}
-		encoder.encode(CharBuffer.wrap(new char[] { c }), buffer, false);
+
+		buffer.append(c);
 		return this;
 	}
 
 	@Override
 	public Appendable append(CharSequence cs, int from, int until) throws IOException {
-		CharBuffer charBuffer = CharBuffer.wrap(cs, from, until);
-
-		while (charBuffer.remaining() > 0) {
-			encoder.encode(charBuffer, buffer, false);
-			if (buffer.remaining() < 16) {
-				writeBuffer(ctx.voidPromise());
-			}
+		if (buffer.remaining() < cs.length()) {
+			writeBuffer(ctx.voidPromise());
 		}
+		buffer.append(cs, from, until);
 		return this;
 	}
 
 	@Override
 	public void close() {
 		writeBuffer(promise);
-		ctx.flush();
 	}
 
 	private void writeBuffer(ChannelPromise channelPromise) {
-		buffer.flip();
-		logger.trace("Writing buffer with {} bytes (void: {})", buffer.remaining(), channelPromise.isVoid());
+		logger.trace("Writing buffer with {} characters (void: {})", buffer.position(), channelPromise.isVoid());
 
+		buffer.flip();
+		ByteBuf bytes = ByteBufUtil.encodeString(ctx.alloc(), buffer, UTF8);
 		HttpContent msg;
 
 		if (channelPromise.isVoid()) {
-			msg = new DefaultHttpContent(Unpooled.copiedBuffer(buffer));
+			msg = new DefaultHttpContent(bytes);
 		} else {
-			msg = new DefaultLastHttpContent(Unpooled.copiedBuffer(buffer));
+			msg = new DefaultLastHttpContent(bytes);
 		}
 
 		ctx.write(msg, channelPromise);

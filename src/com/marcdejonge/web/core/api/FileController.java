@@ -17,13 +17,14 @@ import io.netty.buffer.Unpooled;
 
 public class FileController {
 	protected final Bundle bundle = FrameworkUtil.getBundle(getClass());
-	private final Map<String, FileView> cache = new WeakHashMap<>();
+	private final Map<String, View> cache = new WeakHashMap<>();
+	private final String tag = "tag-" + System.currentTimeMillis();
 
-	protected FileView getCachedView(URL fileUrl) throws IOException {
+	protected View getCachedView(URL fileUrl) throws IOException {
 		String key = fileUrl.toString();
 
 		synchronized (cache) {
-			FileView view = cache.get(key);
+			View view = cache.get(key);
 			if (view != null) {
 				return view;
 			}
@@ -37,20 +38,27 @@ public class FileController {
 		}
 
 		synchronized (cache) {
-			FileView view = new FileView(buffer, fileUrl.getPath());
+			View view = buffer.readableBytes() == 0
+			        ? ErrorView.NOT_FOUND
+			        : new FileView(buffer, fileUrl.getPath(), tag);
 			cache.put(key, view);
 			return view;
 		}
 	}
 
-	protected View findFile(String path) throws IOException {
+	protected View findFile(String path, String tag) throws IOException {
 		if (path.isEmpty()) {
 			path = "index.html";
 		}
 
 		URL url = bundle.getResource("web/" + path);
 		if (url != null) {
-			return getCachedView(url);
+			View cachedView = getCachedView(url);
+			if (cachedView instanceof FileView && this.tag.equals(tag)) {
+				return new NotModifiedView(path, tag);
+			} else {
+				return cachedView;
+			}
 		} else {
 			return ErrorView.NOT_FOUND;
 		}

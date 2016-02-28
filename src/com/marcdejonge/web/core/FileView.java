@@ -11,10 +11,12 @@ public class FileView implements View {
 
 	private final ByteBuf contents;
 	private final String extension;
+	private final String tag;
 
-	public FileView(ByteBuf buffer, String fileName) {
+	public FileView(ByteBuf buffer, String fileName, String tag) {
 		contents = buffer;
 		extension = fileName == null ? "" : fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+		this.tag = tag;
 	}
 
 	@Override
@@ -22,28 +24,13 @@ public class FileView implements View {
 		return 200;
 	}
 
+	public String getExtension() {
+		return extension;
+	}
+
 	@Override
 	public String getContentType() {
-		switch (extension) {
-		case "html":
-		case "htm":
-			return "text/html; charset=utf-8";
-		case "css":
-			return "text/css; charset=utf-8";
-		case "js":
-			return "application/javascript; charset=utf-8";
-		case "jpg":
-		case "jpeg":
-			return "image/jpg";
-		case "png":
-			return "image/png";
-		case "gif":
-			return "image/gif";
-		case "svg":
-			return "image/svg+xml; charset=utf-8";
-		default:
-			return "text/plain; charset=utf-8";
-		}
+		return View.detectContentType(extension);
 	}
 
 	public void write(ChannelHandlerContext ctx, ChannelPromise promise) {
@@ -60,5 +47,10 @@ public class FileView implements View {
 	@Override
 	public int getContentLength() {
 		return contents.readableBytes();
+	}
+
+	@Override
+	public String getCacheTag() {
+		return tag;
 	}
 }

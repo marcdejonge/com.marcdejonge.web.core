@@ -1,9 +1,6 @@
 package com.marcdejonge.web.core;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
-import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
-import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
-import static io.netty.handler.codec.http.HttpHeaderNames.TRANSFER_ENCODING;
+import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
@@ -68,6 +65,10 @@ public class HttpHandler extends SimpleChannelInboundHandler<Object> {
 			}
 			if (request.isKeepAlive()) {
 				response.headers().set(CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+			}
+			if (view.getCacheTag() != null) {
+				response.headers().set(CACHE_CONTROL, "max-age=300");
+				response.headers().set(ETAG, view.getCacheTag());
 			}
 			response.setDecoderResult(DecoderResult.SUCCESS);
 
