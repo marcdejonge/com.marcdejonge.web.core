@@ -15,6 +15,7 @@ import com.marcdejonge.web.core.api.View;
 import com.marcdejonge.web.core.api.annotations.GetParam;
 import com.marcdejonge.web.core.api.annotations.Header;
 import com.marcdejonge.web.core.api.annotations.Hostname;
+import com.marcdejonge.web.core.api.annotations.Optional;
 import com.marcdejonge.web.core.api.annotations.PathPart;
 import com.marcdejonge.web.core.api.annotations.PathRest;
 import com.marcdejonge.web.core.api.annotations.PostData;
@@ -128,7 +129,7 @@ public class ControllerWrapper {
 				}
 			}
 
-			if (parameters[ix] == null) {
+			if (parameters[ix] == null && parameter.getAnnotation(Optional.class) == null) {
 				return ErrorView.BAD_REQUEST;
 			}
 		}
